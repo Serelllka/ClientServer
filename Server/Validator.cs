@@ -65,6 +65,8 @@ public class Validator
                 var list = Types.ToMessage(message).Split(" ").ToList();
                 return list.Count == 3 && list[0] == "OK" && int.TryParse(list[1], out _) && int.TryParse(list[2], out _)
                     ? Types.Codes.ValidMessage : Types.Codes.ServerSyntaxError;
+            case Types.Codes.ClientMessage:
+                return Types.Codes.ValidMessage;
             default:
                 throw new ArgumentOutOfRangeException(nameof(code), code, null);
         }

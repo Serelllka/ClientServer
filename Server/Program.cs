@@ -32,6 +32,7 @@ namespace ConsoleServer
                 config.SetMaxLenght(Types.Codes.ClientFullPower, 20);
                 config.SetMaxLenght(Types.Codes.ClientRecharging, 20);
                 config.SetMaxLenght(Types.Codes.ClientOk, 12);
+                config.SetMaxLenght(Types.Codes.ClientMessage, 100);
                 
                 
                 while(true)

@@ -13,9 +13,11 @@ namespace Server
         private ServerConfig _config;
         private bool _checked;
         private Validator _validator;
+        private string _prevString;
         
         public ClientObject(TcpClient tcpClient, ServerConfig config)
         {
+            _prevString = "";
             _stream = null;
             _authUser = null;
             _validator = new Validator(config);
@@ -88,7 +90,7 @@ namespace Server
         }
         private string ReceiveMessage()
         {
-            var builder = new StringBuilder();
+            var builder = new StringBuilder(_prevString);
             var data = new byte[64];
             do
             {
@@ -100,6 +102,17 @@ namespace Server
             
             WriteLine("MESSAGE RECEIVED: " + message);
             return message;
+        }
+
+        private string GetLastMessage(string message)
+        {
+            if (!message.Contains(_config.MessageSuffix))
+            {
+                SendMessage(Types.GetRequest(Types.Codes.ServerSyntaxError));
+                throw new Exception(Types.GetMessage(Types.Codes.ServerSyntaxError));
+            }
+            var val = message.IndexOf(_config.MessageSuffix, StringComparison.Ordinal);
+            return "";
         }
 
         private void SendMessage(string message)
@@ -231,6 +244,10 @@ namespace Server
                     directions = Algorithm.GetDirections(currPosition);
                 }
             }
+            
+            SendMessage(Types.GetRequest(Types.Codes.ServerPickUp));
+            ReceiveNotRechargingMessage(Types.Codes.ClientMessage);
+            SendMessage(Types.GetRequest(Types.Codes.ServerLogout));
         }
     }
 }

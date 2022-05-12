@@ -78,6 +78,8 @@ public class Types
             Codes.ServerMove => "102 MOVE",
             Codes.ServerTurnLeft => "103 TURN LEFT",
             Codes.ServerTurnRight => "104 TURN RIGHT",
+            Codes.ServerPickUp => "105 GET MESSAGE",
+            Codes.ServerLogout => "106 LOGOUT",
             Codes.ServerKeyRequest => "107 KEY REQUEST",
             Codes.ServerSyntaxError => "301 SYNTAX ERROR",
             Codes.ServerLogicError => "302 LOGIC ERROR",
