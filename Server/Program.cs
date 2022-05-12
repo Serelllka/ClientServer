@@ -33,6 +33,7 @@ namespace ConsoleServer
                 config.SetMaxLenght(Types.Codes.ClientRecharging, 20);
                 config.SetMaxLenght(Types.Codes.ClientOk, 12);
                 config.SetMaxLenght(Types.Codes.ClientMessage, 100);
+                config.TestNumber = 1;
                 
                 
                 while(true)
@@ -42,6 +43,7 @@ namespace ConsoleServer
                     var clientObject = new ClientObject(client, config);
                     var clientThread = new Thread(clientObject.Process);
                     clientThread.Start();
+                    ++config.TestNumber;
                 }
             }
             catch(Exception ex)

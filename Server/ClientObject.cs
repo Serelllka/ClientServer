@@ -28,7 +28,7 @@ namespace Server
  
         public void Process()
         {
-            WriteLine("Starting new session!...");
+            WriteLine("Starting new session!... " + _config.TestNumber);
             try
             {
                 _stream = _client.GetStream();
