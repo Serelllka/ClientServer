@@ -33,9 +33,8 @@ namespace ConsoleServer
                 config.SetMaxLenght(Types.Codes.ClientRecharging, 12);
                 config.SetMaxLenght(Types.Codes.ClientOk, 12);
                 config.SetMaxLenght(Types.Codes.ClientMessage, 100);
-                config.TestNumber = 1;
-                
-                
+
+
                 while(true)
                 {
                     var client = listener.AcceptTcpClient();
@@ -43,7 +42,6 @@ namespace ConsoleServer
                     var clientObject = new ClientObject(client, config);
                     var clientThread = new Thread(clientObject.Process);
                     clientThread.Start();
-                    ++config.TestNumber;
                 }
             }
             catch(Exception ex)

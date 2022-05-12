@@ -7,12 +7,12 @@ namespace Server
 {
     public class ClientObject
     {
-        private TcpClient _client;
+        private readonly TcpClient _client;
         private User _authUser;
         private NetworkStream _stream;
-        private ServerConfig _config;
+        private readonly ServerConfig _config;
         private bool _checked;
-        private Validator _validator;
+        private readonly Validator _validator;
         private string _prevString;
         
         public ClientObject(TcpClient tcpClient, ServerConfig config)
@@ -28,12 +28,10 @@ namespace Server
  
         public void Process()
         {
-            WriteLine("Starting new session!... " + _config.TestNumber);
+            WriteLine("Starting new session!... ");
             try
             {
                 _stream = _client.GetStream();
-                // while (true)
-                //     ReceiveNotRechargingMessage(Types.Codes.ClientUsername);
                 var message = ReceiveNotRechargingMessage(Types.Codes.ClientUsername);
                 Auth(message);
                 
@@ -92,7 +90,7 @@ namespace Server
         private string ReceiveMessage(Types.Codes code)
         {
             var builder = new StringBuilder(_prevString);
-            var data = new byte[64];
+            var data = new byte[128];
             if (!_prevString.Contains(_config.MessageSuffix))
             {
                 do
@@ -118,8 +116,6 @@ namespace Server
             }
             var val = message.IndexOf(_config.MessageSuffix, StringComparison.Ordinal);
             _prevString = message[(val + _config.MessageSuffix.Length)..];
-            // WriteLine(message[..val]);
-            // WriteLine(_prevString);
             return message[..val] + _config.MessageSuffix;
         }
 
@@ -196,24 +192,18 @@ namespace Server
                     break;
             }
         }
-        
-        void RunAlgo()
-        {
-            Types.Position prevPosition;
-            Types.Position currPosition;
-            Types.Direction currDirection;
-            Types.Direction vertDirection;
-            Types.Direction horDirection;
 
-            prevPosition = ServerMove(Types.Codes.ServerMove);
-            currPosition = ServerMove(Types.Codes.ServerMove);
+        private void RunAlgo()
+        {
+            var prevPosition = ServerMove(Types.Codes.ServerMove);
+            var currPosition = ServerMove(Types.Codes.ServerMove);
             if (currPosition == prevPosition)
             {
                 ServerMove(Types.Codes.ServerTurnRight);
                 currPosition = ServerMove(Types.Codes.ServerMove);
             }
             
-            currDirection = Algorithm.GetMotionVector(prevPosition, currPosition);
+            var currDirection = Algorithm.GetMotionVector(prevPosition, currPosition);
             while (currPosition.Y != 0 || currPosition.X != 0)
             {
                 var directions = Algorithm.GetDirections(currPosition);
