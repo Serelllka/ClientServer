@@ -20,7 +20,7 @@ namespace ConsoleServer
 
                 var config = new ServerConfig
                 {
-                    MessageSuffix = "\\a\\b",
+                    MessageSuffix = "\a\b",
                     ReceiveTimeout = 100000,
                     RechargingTimeout = 5000,
                     MaxId = 4,

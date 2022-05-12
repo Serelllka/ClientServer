@@ -94,18 +94,18 @@ public class Types
         return returnValue;
     }
 
-    public static string GetMessage(Codes code)
+    public static string GetMessage(Codes code, ServerConfig config)
     {
-        return ToMessage(GetRequest(code));
+        return ToMessage(GetRequest(code), config);
     }
 
-    public static string ToMessage(string request)
+    public static string ToMessage(string request, ServerConfig config)
     {
-        return request.Replace("\\a\\b", "");
+        return request.Replace(config.MessageSuffix, "");
     }
     
-    public static string ToRequest(string message)
+    public static string ToRequest(string message, ServerConfig config)
     {
-        return message + "\\a\\b";
+        return message + config.MessageSuffix;
     }
 }

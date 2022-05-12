@@ -46,7 +46,7 @@ public class Validator
             case Types.Codes.ClientUsername:
                 return Types.Codes.ValidMessage;
             case Types.Codes.ClientKeyId:
-                if (!int.TryParse(Types.ToMessage(message), out var id))
+                if (!int.TryParse(Types.ToMessage(message, _config), out var id))
                 {
                     return Types.Codes.ServerSyntaxError;
                 }
@@ -59,10 +59,10 @@ public class Validator
                     return Types.Codes.ValidMessage;
                 }
             case Types.Codes.ClientConfirmation:
-                return int.TryParse(Types.ToMessage(message), out _) 
+                return int.TryParse(Types.ToMessage(message, _config), out _) 
                     ? Types.Codes.ValidMessage : Types.Codes.ServerSyntaxError;
             case Types.Codes.ClientOk:
-                var list = Types.ToMessage(message).Split(" ").ToList();
+                var list = Types.ToMessage(message, _config).Split(" ").ToList();
                 return list.Count == 3 && list[0] == "OK" && int.TryParse(list[1], out _) && int.TryParse(list[2], out _)
                     ? Types.Codes.ValidMessage : Types.Codes.ServerSyntaxError;
             case Types.Codes.ClientMessage:

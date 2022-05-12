@@ -86,7 +86,7 @@ namespace Server
                 message = ReceiveMessage();
             }
 
-            return Types.ToMessage(message);
+            return Types.ToMessage(message, _config);
         }
         private string ReceiveMessage()
         {
@@ -109,7 +109,7 @@ namespace Server
             if (!message.Contains(_config.MessageSuffix))
             {
                 SendMessage(Types.GetRequest(Types.Codes.ServerSyntaxError));
-                throw new Exception(Types.GetMessage(Types.Codes.ServerSyntaxError));
+                throw new Exception(Types.GetMessage(Types.Codes.ServerSyntaxError, _config));
             }
             var val = message.IndexOf(_config.MessageSuffix, StringComparison.Ordinal);
             return "";
@@ -130,7 +130,7 @@ namespace Server
             _authUser.Hash = sum;
             sum += Types.Ids[_authUser.ClientKeyId].Key;
             sum %= 65536;
-            SendMessage(Types.ToRequest(sum.ToString()));
+            SendMessage(Types.ToRequest(sum.ToString(), _config));
         }
 
         private void ServerCheck(string message)
@@ -145,7 +145,7 @@ namespace Server
             }
             
             SendMessage(Types.GetRequest(Types.Codes.ServerLoginFailed));
-            throw new Exception(Types.GetMessage(Types.Codes.ServerLoginFailed));
+            throw new Exception(Types.GetMessage(Types.Codes.ServerLoginFailed, _config));
         }
 
         private Types.Position ServerMove(Types.Codes code)
@@ -165,7 +165,7 @@ namespace Server
 
             if (value is Types.Codes.ValidMessage) return;
             SendMessage(Types.GetRequest(value));
-            throw new Exception(Types.GetMessage(value));
+            throw new Exception(Types.GetMessage(value, _config));
         }
 
         private void ChangeDirection(Types.Direction from, Types.Direction to)
