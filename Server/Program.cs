@@ -18,12 +18,28 @@ namespace ConsoleServer
                 listener = new TcpListener(IPAddress.Parse(Addr), Port);
                 listener.Start();
 
+                var config = new ServerConfig
+                {
+                    MessageSuffix = "\\a\\b",
+                    ReceiveTimeout = 100000,
+                    RechargingTimeout = 5000,
+                    MaxId = 4,
+                    MinId = 0
+                };
+                config.SetMaxLenght(Types.Codes.ClientUsername, 20);
+                config.SetMaxLenght(Types.Codes.ClientKeyId, 5);
+                config.SetMaxLenght(Types.Codes.ClientConfirmation, 9);
+                config.SetMaxLenght(Types.Codes.ClientFullPower, 20);
+                config.SetMaxLenght(Types.Codes.ClientRecharging, 20);
+                config.SetMaxLenght(Types.Codes.ClientOk, 12);
+                
+                
                 while(true)
                 {
-                    TcpClient client = listener.AcceptTcpClient();
-                    client.ReceiveTimeout = 100000;
-                    ClientObject clientObject = new ClientObject(client);
-                    Thread clientThread = new Thread(clientObject.Process);
+                    var client = listener.AcceptTcpClient();
+                    client.ReceiveTimeout = config.ReceiveTimeout;
+                    var clientObject = new ClientObject(client, config);
+                    var clientThread = new Thread(clientObject.Process);
                     clientThread.Start();
                 }
             }

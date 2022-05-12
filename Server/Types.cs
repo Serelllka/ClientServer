@@ -1,7 +1,32 @@
-﻿namespace Server;
+﻿using System.Reflection;
+using Microsoft.VisualBasic.CompilerServices;
+
+namespace Server;
 
 public class Types
 {
+    public struct Position
+    {
+        public int X = 0, Y = 0;
+        public Position() {}
+        public Position(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        public static bool operator ==(Position a, Position b) => a.X == b.X && a.Y == b.Y;
+        public static bool operator !=(Position a, Position b) => !(a == b);
+    }
+
+    public enum Direction
+    {
+        Left = 0,
+        Up = 1,
+        Right = 2,
+        Down = 3,
+    }
+    
     public static List<KeyValuePair<int, int>> Ids = new(){
         new KeyValuePair<int, int>(23019,32037),
         new KeyValuePair<int, int>(32037,29295),
@@ -11,6 +36,8 @@ public class Types
     };
     public enum Codes
     {
+        ValidMessage,
+        
         ServerConfirmation,
         ServerMove,
         ServerTurnLeft,
@@ -36,9 +63,8 @@ public class Types
     {
         return code switch
         {
-            Codes.ClientUsername => message.EndsWith("\\a\\b") && message.Length <= maxMessageLen,
-            Codes.ClientFullPower => message == GetRequest(Codes.ClientFullPower),
-            Codes.ClientKeyId => message.Length <= maxMessageLen && int.TryParse(message, out _),
+
+            
             Codes.ClientConfirmation => message.Length <= maxMessageLen && int.TryParse(message, out _),
             _ => throw new NotImplementedException("")
         };
@@ -49,6 +75,9 @@ public class Types
         const string suffix = "\\a\\b";
         var returnValue = code switch
         {
+            Codes.ServerMove => "102 MOVE",
+            Codes.ServerTurnLeft => "103 TURN LEFT",
+            Codes.ServerTurnRight => "104 TURN RIGHT",
             Codes.ServerKeyRequest => "107 KEY REQUEST",
             Codes.ServerSyntaxError => "301 SYNTAX ERROR",
             Codes.ServerLogicError => "302 LOGIC ERROR",
@@ -57,7 +86,7 @@ public class Types
             Codes.ClientRecharging => "RECHARGING",
             Codes.ServerLoginFailed => "300 LOGIN FAILED",
             Codes.ServerOk => "200 OK",
-            _ => throw new NotImplementedException("")
+            _ => throw new NotImplementedException("No type!")
         };
         returnValue += suffix;
         return returnValue;

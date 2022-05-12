@@ -1,27 +1,67 @@
 ﻿using System.Net.Sockets;
 using System.Text;
+using Server;
 
 namespace Client
 {
     class Program
     {
-        const int port = 8888;
-        const string address = "127.0.0.1";
-        static bool _flag = true;
-        static private NetworkStream stream;
+        const int Port = 8888;
+        const string Address = "127.0.0.1";
+        static private NetworkStream? stream;
         static void Main(string[] args)
         {
             TcpClient client = null;
             try
             {
-                client = new TcpClient(address, port);
-                stream = client.GetStream();
-
-                while (true)
+                List<KeyValuePair<int, int>> walls = new()
                 {
-                    SendCock();
-                    if (_flag)
-                        ReceiveCock();
+                    new KeyValuePair<int, int>(-5, -9)
+                };
+                client = new TcpClient(Address, Port);
+                stream = client.GetStream();
+                var x = -8;
+                var y = -9;
+                var dx = 1;
+                var dy = 0;
+
+                SendCock("Abobus\\a\\b");
+                Console.WriteLine(ReceiveCock());
+                SendCock("2\\a\\b");
+                Console.WriteLine(ReceiveCock(), "32965\\a\\b");
+                SendCock("27779\\a\\b");
+                Console.WriteLine(ReceiveCock());
+
+
+                while (x != 0 || y != 0)
+                {
+                    string message = ReceiveCock();
+                    Console.WriteLine(message);
+                    if (message == Types.GetRequest(Types.Codes.ServerMove))
+                    {
+                        x += dx;
+                        y += dy;
+                        var tmp = new KeyValuePair<int, int>(x, y);
+                        if (walls.Contains(tmp))
+                        {
+                            x -= dx;
+                            y -= dy;
+                        }
+                    }
+                    if (message == Types.GetRequest(Types.Codes.ServerTurnRight))
+                    {
+                        var tmp = RotateRight(dx, dy);
+                        dx = tmp.Key;
+                        dy = tmp.Value;
+                    }
+                    if (message == Types.GetRequest(Types.Codes.ServerTurnLeft))
+                    {
+                        var tmp = RotateLeft(dx, dy);
+                        dx = tmp.Key;
+                        dy = tmp.Value;
+                    }
+                    Console.WriteLine("OK " + x + " " + y);
+                    SendCock("OK " + x + " " + y + "\\a\\b");
                 }
             }
             catch (Exception ex)
@@ -34,32 +74,13 @@ namespace Client
             }
         }
 
-        static private void SendCock()
+        static private void SendCock(string message)
         {
-            string message = Console.ReadLine();
-            if (message == "r")
-            {
-                _flag = false;
-                message = "RECHARGING\\a\\b";
-                byte[] data1 = Encoding.UTF8.GetBytes(message);
-                stream.Write(data1, 0, data1.Length);
-                return;
-            }
-
-            if (message == "f")
-            {
-                _flag = false;
-                message = "FULL POWER\\a\\b";
-                byte[] data1 = Encoding.UTF8.GetBytes(message);
-                stream.Write(data1, 0, data1.Length);
-                return;
-            }
-            byte[] data = Encoding.UTF8.GetBytes(message);
+            var data = Encoding.UTF8.GetBytes(message);
             stream.Write(data, 0, data.Length);
-            _flag = true;
         }
 
-        static private void ReceiveCock()
+        static private string ReceiveCock()
         {
             byte[] data = new byte[64];
             StringBuilder builder = new StringBuilder();
@@ -72,7 +93,28 @@ namespace Client
             while (stream.DataAvailable);
  
             string message = builder.ToString();
-            Console.WriteLine("Сервер: {0}", message.Replace("\\a\\b", ""));
+            return message;
+        }
+
+        static private KeyValuePair<int, int> RotateRight(int x, int y)
+        {
+            if (x == -1)
+                return new KeyValuePair<int, int>(0, 1);
+            if (y == 1)
+                return new KeyValuePair<int, int>(1, 0);
+            if (x == 1)
+                return new KeyValuePair<int, int>(0, -1);
+            if (y == -1)
+                return new KeyValuePair<int, int>(-1, 0);
+            throw new NotImplementedException("fuck!");
+        }
+
+        static private KeyValuePair<int, int> RotateLeft(int x, int y)
+        {
+            var tmp = RotateRight(x, y);
+            tmp = RotateRight(tmp.Key, tmp.Value);
+            tmp = RotateRight(tmp.Key, tmp.Value);
+            return tmp;
         }
     }
 }
