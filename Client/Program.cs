@@ -14,12 +14,29 @@ namespace Client
             TcpClient client = null;
             try
             {
+                client = new TcpClient(Address, Port);
+                stream = client.GetStream();
+                while (true)
+                {
+                    var tmp = Console.ReadLine();
+                    if (tmp == "r")
+                    {
+                        SendCock("RECHARGING\\a\\b");
+                        continue;
+                    }
+
+                    if (tmp == "f")
+                    {
+                        SendCock("FULL POWER\\a\\b");
+                        continue;
+                    }
+
+                    SendCock(tmp);
+                }
                 List<KeyValuePair<int, int>> walls = new()
                 {
                     new KeyValuePair<int, int>(-5, -9)
                 };
-                client = new TcpClient(Address, Port);
-                stream = client.GetStream();
                 var x = -8;
                 var y = -9;
                 var dx = 1;

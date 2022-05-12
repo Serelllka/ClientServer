@@ -38,6 +38,8 @@ public class Validator
     {
         if (code is not Types.Codes.ClientFullPower && message == Types.GetRequest(Types.Codes.ClientFullPower))
             return Types.Codes.ServerLogicError;
+        if (code is Types.Codes.ClientFullPower && message != Types.GetRequest(Types.Codes.ClientFullPower))
+            return Types.Codes.ServerLogicError;
         switch (code)
         {
             case Types.Codes.ClientFullPower:
@@ -59,7 +61,7 @@ public class Validator
                     return Types.Codes.ValidMessage;
                 }
             case Types.Codes.ClientConfirmation:
-                return int.TryParse(Types.ToMessage(message, _config), out _) 
+                return int.TryParse(Types.ToMessage(message, _config), out _) && !message.Contains(" ")
                     ? Types.Codes.ValidMessage : Types.Codes.ServerSyntaxError;
             case Types.Codes.ClientOk:
                 var list = Types.ToMessage(message, _config).Split(" ").ToList();
