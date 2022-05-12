@@ -72,7 +72,7 @@ public class Types
 
     public static string GetRequest(Codes code)
     {
-        const string suffix = "\\a\\b";
+        const string suffix = "\a\b";
         var returnValue = code switch
         {
             Codes.ServerMove => "102 MOVE",
