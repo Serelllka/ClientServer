@@ -32,8 +32,9 @@ namespace Server
             try
             {
                 _stream = _client.GetStream();
+                // while (true)
+                //     ReceiveNotRechargingMessage(Types.Codes.ClientUsername);
                 var message = ReceiveNotRechargingMessage(Types.Codes.ClientUsername);
-                
                 Auth(message);
                 
                 message = ReceiveNotRechargingMessage(Types.Codes.ClientKeyId);
@@ -64,14 +65,14 @@ namespace Server
 
         private bool IsClientRecharging(Types.Codes code, string input) 
         {
-            Validate(code, input);
             if (input != Types.GetRequest(Types.Codes.ClientRecharging))
             {
+                Validate(code, input);
                 return false;
             }
 
             _client.ReceiveTimeout = _config.RechargingTimeout;
-            var message = ReceiveMessage();
+            var message = ReceiveMessage(code);
             Validate(Types.Codes.ClientFullPower, message);
             
             _client.ReceiveTimeout = _config.ReceiveTimeout;
@@ -80,28 +81,32 @@ namespace Server
 
         private string ReceiveNotRechargingMessage(Types.Codes code)
         {
-            var message = ReceiveMessage();
+            var message = ReceiveMessage(code);
             while (IsClientRecharging(code, message))
             {
-                message = ReceiveMessage();
+                message = ReceiveMessage(code);
             }
 
             return Types.ToMessage(message, _config);
         }
-        private string ReceiveMessage()
+        private string ReceiveMessage(Types.Codes code)
         {
             var builder = new StringBuilder(_prevString);
             var data = new byte[64];
-            do
+            if (!_prevString.Contains(_config.MessageSuffix))
             {
-                var bytes = _stream.Read(data, 0, data.Length);
-                builder.Append(Encoding.UTF8.GetString(data, 0, bytes));
+                do
+                {
+                    var bytes = _stream.Read(data, 0, data.Length);
+                    builder.Append(Encoding.UTF8.GetString(data, 0, bytes));
+                } while (!builder.ToString().Contains(_config.MessageSuffix) &&
+                         builder.ToString().Length < _config.MaxLength[code]);
             }
-            while (_stream.DataAvailable);
+
             var message = builder.ToString();
             
             WriteLine("MESSAGE RECEIVED: " + message);
-            return message;
+            return GetLastMessage(message);
         }
 
         private string GetLastMessage(string message)
@@ -112,7 +117,10 @@ namespace Server
                 throw new Exception(Types.GetMessage(Types.Codes.ServerSyntaxError, _config));
             }
             var val = message.IndexOf(_config.MessageSuffix, StringComparison.Ordinal);
-            return "";
+            _prevString = message[(val + _config.MessageSuffix.Length)..];
+            // WriteLine(message[..val]);
+            // WriteLine(_prevString);
+            return message[..val] + _config.MessageSuffix;
         }
 
         private void SendMessage(string message)

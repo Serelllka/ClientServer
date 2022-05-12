@@ -21,16 +21,16 @@ namespace ConsoleServer
                 var config = new ServerConfig
                 {
                     MessageSuffix = "\a\b",
-                    ReceiveTimeout = 100000,
+                    ReceiveTimeout = 1000,
                     RechargingTimeout = 5000,
                     MaxId = 4,
                     MinId = 0
                 };
                 config.SetMaxLenght(Types.Codes.ClientUsername, 20);
                 config.SetMaxLenght(Types.Codes.ClientKeyId, 5);
-                config.SetMaxLenght(Types.Codes.ClientConfirmation, 9);
-                config.SetMaxLenght(Types.Codes.ClientFullPower, 20);
-                config.SetMaxLenght(Types.Codes.ClientRecharging, 20);
+                config.SetMaxLenght(Types.Codes.ClientConfirmation, 7);
+                config.SetMaxLenght(Types.Codes.ClientFullPower, 12);
+                config.SetMaxLenght(Types.Codes.ClientRecharging, 12);
                 config.SetMaxLenght(Types.Codes.ClientOk, 12);
                 config.SetMaxLenght(Types.Codes.ClientMessage, 100);
                 config.TestNumber = 1;

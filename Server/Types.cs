@@ -59,17 +59,6 @@ public class Types
         ServerOk
     }
     
-    public static bool IsValid(Codes code, string message, int maxMessageLen = 0)
-    {
-        return code switch
-        {
-
-            
-            Codes.ClientConfirmation => message.Length <= maxMessageLen && int.TryParse(message, out _),
-            _ => throw new NotImplementedException("")
-        };
-    }
-
     public static string GetRequest(Codes code)
     {
         const string suffix = "\a\b";
